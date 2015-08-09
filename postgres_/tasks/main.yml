@@ -1,6 +1,6 @@
 ---
 - name: include default step variables
-  include_vars: /vars/main.yml
+  include_vars: ./vars/main.yml
 
 - name: Install PostgreSQL
   apt: name={{item}} update_cache=yes state=installed

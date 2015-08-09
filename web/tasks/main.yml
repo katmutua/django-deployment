@@ -25,20 +25,20 @@
   tags: packages
 
 - name: Create the virtualenv
-  command: virtualenv {{virtualenv}} --no-site-packages
-           creates={{virtualenv}}'/activate'
+  command: virtualenv {{virtualenv}}--no-site-packages
+           creates={{virtualenv}}/activate
 
 - name: Create the application log folder
   file: path={{project_dir}}
-        owner={{remote_user}}
-        group={{remote_user}}
+        owner='{{remote_user}}'
+        group='{{remote_user}}'
         state=directory
 
 - name: Create the virtualenv postactivate script to set environment variables
   template: src=postactivate_template.j2
             dest={{virtualenv}}'/postactivate'
-            owner={{remote_user}}
-            group={{remote_user}}
+            owner='{{remote_user}}'
+            group='{{remote_user}}'
             backup=yes
 
 - name: Pull latest code from github
@@ -49,7 +49,7 @@
 
 - name: Create a log directory for supervisor
   file: path={{project_dir}}/supervisord
-        owner={{remote_user}}
+        owner='{{remote_user}}'
         state=directory
 
 - name: Generate configuration file for supervisor
@@ -66,8 +66,8 @@
 - name: Initialise log rotation for Supervisord
   template: src=supervisor_log_template.j2
             dest='/etc/logrotate.d/'{{application_name}}'-supervisor.log'
-            owner={{remote_user}}
-            group={{remote_user}}
+            owner='{{remote_user}}'
+            group='{{remote_user}}'
 
 - name: Install django application requirements in virtualenv
   sudo: yes 
@@ -76,30 +76,26 @@
     - requirements 
 
 - name: Run makemigrations command
-  sudo_user: {{remote_user}}
+  sudo_user: '{{remote_user}}'
   sudo: yes
-  shell: {{virtualenv}}/activate && {{virtualenv}}/postactivate
-  			&& cd {{project_dir}}
-        && python manage.py makemigrations --noinput
+  shell: . {{virtualenv}}/activate && . {{virtualenv}}/postactivate && cd '{{project_dir}}' && python manage.py makemigrations --noinput
   when: run_django_syncdb
   tags: 
    - django 
    - syncdb
 
 - name: Run migrate command
-  sudo_user: {{remote_user}}
-  shell:  {{virtualenv}}/activate && {{virtualenv}}/postactivate
-         && cd {{project_dir}}
-				 && python manage.py migrate --noinput
+  sudo_user: '{{remote_user}}'
+  shell: . {{virtualenv}}/activate &&  . {{virtualenv}}/postactivate
+         && cd '{{project_dir}}' && python manage.py migrate --noinput
   when: run_django_migrations
   tags: 
     - django 
     - migrate
 
 - name: Generate static django files for application
-  shell: {{virtualenv}}/activate && {{virtualenv}}/postactivate
-         && cd {{project_dir}}
-				 && python manage.py collectstatic --noinput
+  shell: . {{virtualenv}}/activate && . {{virtualenv}}/postactivate
+         && cd '{{project_dir}}' && python manage.py collectstatic --noinput
   when: run_django_collectstatic
   tags: 
     - django 
