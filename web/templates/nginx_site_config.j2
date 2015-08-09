@@ -1,0 +1,38 @@
+upstream wsgi_server_webparticipation{
+  server unix:/{{virtual_env}}/run/gunicorn.sock fail_timeout=0;
+}
+
+# Redirect from www.
+#server {
+#    listen 80;
+#    server_name localhost;
+#    ;
+#}
+
+server {
+    listen      80;
+    server_name {{server_name}};
+
+    client_max_body_size 4G;
+
+    access_log /{{project_dir}}/nginx_access_log;
+    error_log /{{project_dir}}/nginx_error_log;
+
+    location /static/ {
+        alias   /{{project_dir}}/{{application}}/static;
+        expires 1d;
+        add_header Pragma public;
+        add_header Cache-Control "public";
+    }
+
+    location /media/ {
+        alias {{project_dir}}/{{application}}/media;
+    }
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;   
+        proxy_pass http://wsgi_server_{{application}};    
+        
+    }
+   
+}
