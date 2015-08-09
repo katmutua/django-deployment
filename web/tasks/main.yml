@@ -1,2 +1,25 @@
 ---
-# tasks file for web
+- name: Install openssl and libssl
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items:
+    - openssl
+    - libssl-dev
+    - libssl-doc
+  tags: packages
+
+- name: Baase package install
+  apt: name={{ item }} update_cache=yes force=yes state=installed
+  with_items:
+    - build-essential
+    - git
+    - python-dev
+    - python-pip
+    - python-pycurl
+    - supervisor
+  tags: packages
+
+- name: Install virtualenv
+  pip: name={{ item }}
+  with_items:
+    - virtualenv
+  tags: packages
