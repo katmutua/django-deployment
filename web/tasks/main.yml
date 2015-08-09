@@ -53,7 +53,7 @@
         state=directory
 
 - name: Generate configuration file for supervisor
-  template: src=supervisor_config.j2
+  template: src=supervisor_config_template.j2
             dest=/etc/supervisor/conf.d/{{application_name}}.conf
             backup=yes
 
@@ -64,7 +64,7 @@
   command: supervisorctl update
 
 - name: Initialise log rotation for Supervisord
-  template: src=supervisor_log.j2
+  template: src=supervisor_log_template.j2
             dest='/etc/logrotate.d/'{{application_name}}'-supervisor.log'
             owner={{remote_user}}
             group={{remote_user}}
