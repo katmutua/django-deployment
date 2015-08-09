@@ -1,5 +1,5 @@
 upstream wsgi_server_webparticipation{
-  server unix:/{{virtual_env}}/run/gunicorn.sock fail_timeout=0;
+  server unix://{{project_dir}}/{{application}}.sock fail_timeout=0;
 }
 
 server {
