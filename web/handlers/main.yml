@@ -1,7 +1,7 @@
 ---
 
 - name: start application
-  supervisorctl: name=webparticipation state=restarted
+  supervisorctl: name={{application}} state=restarted
   tags: 
     - deploy
 
