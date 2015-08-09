@@ -1,8 +1,4 @@
 ---
-- name: Load up project vars
-- include_vars: "{{ item }}"
-  with_first_found:
-   - "main.yml"
 
 - name: Provisioning application 
   hosts: all
@@ -22,7 +18,7 @@
     - run_django_migrations: yes
     - run_django_collectstatic: yes
     - setup_git_repo: yes
-    - git_repo:'{{git_repo}}'
+    - git_repo: '{{git_repo}}'
     - nginx_server_name: localhost
     - nginx_http_port: 80
     - nginx_https_port: 443
@@ -31,7 +27,10 @@
     - nginx_static_dir: '{{nginx_static_dir}}'
     - nginx_media_dir: '{{nginx_media_dir}}'
 
+  vars_files:
+    - ./vars/vars.yml
+
   roles:
     - postgres
-    - web
-    - celery
+    #- web
+    #- celery
