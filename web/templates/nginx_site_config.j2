@@ -2,13 +2,6 @@ upstream wsgi_server_webparticipation{
   server unix:/{{virtual_env}}/run/gunicorn.sock fail_timeout=0;
 }
 
-# Redirect from www.
-#server {
-#    listen 80;
-#    server_name localhost;
-#    ;
-#}
-
 server {
     listen      80;
     server_name {{server_name}};
