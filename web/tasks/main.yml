@@ -7,7 +7,7 @@
     - libssl-doc
   tags: packages
 
-- name: Baase package install
+- name: Base package install
   apt: name={{ item }} update_cache=yes force=yes state=installed
   with_items:
     - build-essential
@@ -23,3 +23,21 @@
   with_items:
     - virtualenv
   tags: packages
+
+- name: Create the virtualenv
+  command: virtualenv {{virtualenv}} --no-site-packages
+           creates={{virtualenv}}/activate
+
+- name: Create the application log folder
+  file: path={{project_dir}}
+        owner={{remote_user}}
+        group={{remote_user}}
+        state=directory
+
+- name: Create the virtualenv postactivate script to set environment variables
+  template: src=postactivate_template.j2
+            dest={{virtualenv}}/postactivate
+            owner={{remote_user}}
+            group={{remote_user}}
+            backup=yes
+
