@@ -1,33 +1,35 @@
 ---
 - name: Load up project vars
-  include_vars: /vars/main.yml
+- include_vars: "{{ item }}"
+  with_first_found:
+   - "main.yml"
 
-- name: Provisioning applciation 
+- name: Provisioning application 
   hosts: all
   gather_facts: no
   sudo: yes
   sudo_user: root
-  remote_user: {{remote_user}}
+  remote_user: '{{remote_user}}'
 
   vars:
-    - virtualenv_path: {{virtualenv_path}}
-    - django_dir: {{django_dir}}
-    - application_log_dir: {{application_log_dir}}
-    - requirements_file: {{requirements_file}}
-    - django_settings_file: {{django_dir}}
-    - django_secret_key: {{django_secret_key}}
+    - virtualenv_path: '{{virtualenv_path}}'
+    - django_dir: '{{django_dir}}'
+    - application_log_dir: '{{application_log_dir}}'
+    - requirements_file: '{{requirements_file}}'
+    - django_settings_file: '{{django_dir}}'
+    - django_secret_key: '{{django_secret_key}}'
     - run_django_syncdb: yes
     - run_django_migrations: yes
     - run_django_collectstatic: yes
     - setup_git_repo: yes
-    - git_repo: {{git_repo}}
+    - git_repo:'{{git_repo}}'
     - nginx_server_name: localhost
     - nginx_http_port: 80
     - nginx_https_port: 443
-    - nginx_access_log_file: {{nginx_access_log_file}}
-    - nginx_error_log_file: {{nginx_error_log_file}}
-    - nginx_static_dir: {{nginx_static_dir}}
-    - nginx_media_dir: {{nginx_media_dir}}
+    - nginx_access_log_file: '{{nginx_access_log_file}}'
+    - nginx_error_log_file: '{{nginx_error_log_file}}'
+    - nginx_static_dir: '{{nginx_static_dir}}'
+    - nginx_media_dir: '{{nginx_media_dir}}'
 
   roles:
     - postgres
