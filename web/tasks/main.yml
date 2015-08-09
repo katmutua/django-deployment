@@ -26,7 +26,7 @@
 
 - name: Create the virtualenv
   command: virtualenv {{virtualenv}} --no-site-packages
-           creates={{virtualenv}}/activate
+           creates={{virtualenv}}'/activate'
 
 - name: Create the application log folder
   file: path={{project_dir}}
@@ -36,8 +36,36 @@
 
 - name: Create the virtualenv postactivate script to set environment variables
   template: src=postactivate_template.j2
-            dest={{virtualenv}}/postactivate
+            dest={{virtualenv}}'/postactivate'
             owner={{remote_user}}
             group={{remote_user}}
             backup=yes
+
+- name: Pull latest code from github
+  git: repo={{github_repo}} dest={{project_dir}} update=yes accept_hostkey=yes
+  tags: 
+    - git 
+    - deploy
+
+- name: Create a log directory for supervisor
+  file: path={{project_dir}}/supervisord
+        owner={{remote_user}}
+        state=directory
+
+- name: Generate configuration file for supervisor
+  template: src=supervisor_config.j2
+            dest=/etc/supervisor/conf.d/{{application_name}}.conf
+            backup=yes
+
+- name: Reload supervisor configuration files if modified
+  command: supervisorctl reread
+
+- name: Update Supervisor to add the app in the process group
+  command: supervisorctl update
+
+- name: Initialise log rotation for Supervisord
+  template: src=supervisor_log.j2
+            dest='/etc/logrotate.d/'{{application_name}}'-supervisor.log'
+            owner={{remote_user}}
+            group={{remote_user}}
 
