@@ -1,0 +1,5 @@
+[program:{{application}}]
+command = {{virtual_env}}bin/gunicorn_start
+user = {{remote_user}}
+stdout_logfile = {{project_dir}}/supervisord/gunicorn_supervisor.log
+redirect_stderr = true

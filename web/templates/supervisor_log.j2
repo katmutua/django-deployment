@@ -1,0 +1,10 @@
+{{project_dir}}/supervisord/*.log {
+    monthly
+    rotate 2
+    missingok
+    compress
+    delaycompress
+    notifempty
+    create 0640 {{remote_user}} {{remote_user}}
+    sharedscripts
+}
