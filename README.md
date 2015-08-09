@@ -1,2 +1,9 @@
-# Py-Client
-Demostrate network programming with python using a socket based chat application
+# Django Deployment
+Resources to deploy and provision an ec2 instance with ansible. 
+
+##Deployment stack
+- Postgres
+- Django
+- Ansible
+- Nginx
+- Uwsgi
