@@ -1,2 +1,10 @@
 ---
-# handlers file for web
+
+- name: start application
+  supervisorctl: name=webparticipation state=restarted
+  tags: 
+    - deploy
+
+- name: start nginx
+  service: name=nginx state=restarted enabled=yes
+
