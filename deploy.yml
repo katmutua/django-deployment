@@ -1,4 +1,6 @@
 ---
+- name: Load up project vars
+  include_vars: /vars/main.yml
 
 - name: Provisioning applciation 
   hosts: all
