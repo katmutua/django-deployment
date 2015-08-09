@@ -5,6 +5,7 @@ Resources to deploy and provision an AWS EC2 instance and deploy a django applci
 - Ansible
 - Nginx
 - Supervisor
+- Celery
 - Uwsgi
 
 ##Launch
