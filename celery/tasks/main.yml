@@ -36,7 +36,7 @@
 
 - name: Copy celery startup script to bin
   template: src=init_celery.j2
-    dest='{{virtual_env}}/bin/start_celery'
+    dest='{{virtual_env_activate}}/start_celery'
     owner={{remote_user}}
     group={{remote_user}}
   tags: celery
