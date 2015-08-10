@@ -1,5 +1,8 @@
-[program:{{application}}]
-command = {{virtual_env}}bin/gunicorn_start
-user = {{remote_user}}
-stdout_logfile = {{project_dir}}/supervisord/gunicorn_supervisor.log
-redirect_stderr = true
+[program:{{application_name}}]
+autostart = true
+user=root
+command=uwsgi --master --workers  5 --disable-logging --socket 127.0.0.1:8888 --module web --callable app
+priority=1
+redirect_stderr=true
+#stdout_logfile = {{uwsgi_logs}}
+
