@@ -1,31 +1,24 @@
-upstream wsgi_server_webparticipation{
-  server unix://{{project_dir}}/{{application}}.sock fail_timeout=0;
+upstream django {
+    server 127.0.0.1:8001;
 }
 
 server {
-    listen      80;
-    server_name {{server_name}};
+    listen 80;
+    server_name 173.31.5.211; 
+    charset utf-8;
+    error_log /var/log/nginx/{{application_name}}.error.log debug;
+    client_max_body_size 75M; 
 
-    client_max_body_size 4G;
-
-    access_log /{{project_dir}}/nginx_access_log;
-    error_log /{{project_dir}}/nginx_error_log;
-
-    location /static/ {
-        alias   /{{project_dir}}/{{application}}/static;
-        expires 1d;
-        add_header Pragma public;
-        add_header Cache-Control "public";
-    }
-
-    location /media/ {
-        alias {{project_dir}}/{{application}}/media;
+    location /static {
+       alias {{project_dir}}/{{application_name}}/static;
     }
 
     location / {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;   
-        proxy_pass http://wsgi_server_{{application}};    
-        
+        include {{project_dir}}/uwsgi_params;
+        uwsgi_pass 127.0.0.1:8001;
+        uwsgi_param Host $host;
+        uwsgi_param X-Real-IP $remote_addr;
+        uwsgi_param X-Forwarded-For $proxy_add_x_forwarded_for;
+        uwsgi_param X-Forwarded-Proto $http_x_forwarded_proto;
     }
-   
 }

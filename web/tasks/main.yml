@@ -19,6 +19,8 @@
     - python-pip
     - python-pycurl
     - supervisor
+    - uwsgi
+
   tags: packages
 
 - name: Install virtualenv
@@ -50,6 +52,26 @@
   tags: 
     - git 
     - deploy
+
+- name: Create log directory for uwsgi
+  file: path={{project_dir}}/uwsgi
+        owner='{{remote_user}}'
+        state=directory
+
+- name: Generate configuration file for supervisor
+  template: src=uwsgi_conf.j2
+            dest=/etc/uwsgi/conf.d/{{application_name}}.conf
+            backup=yes
+
+- name: Generate ini file for uwsgi:
+  template: src=uwsgi.ini
+            dest=/etc/uwsgi/conf.d/{{application_name}}.ini
+            backup=yes
+
+- name: Genearte uwsgi params file:
+  template: src=uwsgi.ini
+            dest=/etc/uwsgi/conf.d/{{application_name}}.ini
+            backup=yes
 
 - name: Create a log directory for supervisor
   file: path={{project_dir}}/supervisord
@@ -120,7 +142,7 @@
 
 - name: Create the Nginx configuration file
   template: src=nginx_site_config.j2
-            dest=/etc/nginx/sites-available/{{application_name}}
+            dest=/etc/nginx/conf.d/{{application}}.conf
             backup=yes
 
 - name: Ensure that the default site is disabled
