@@ -10,7 +10,7 @@
   template: src=redis_conf.j2 dest="/etc/init/redis-server.conf" 
   tags: redis
 
-- name: Append 'daemonizie=no' to config (https://gist.github.com/bdotdub/714533)
+- name: Append 'daemonizie=no' to config 
   lineinfile: >
     dest='/etc/redis/redis.conf'
     line='daemonize no'
