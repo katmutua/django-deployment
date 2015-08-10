@@ -1,0 +1,9 @@
+{{project_dir}}/celery/*.log {
+  monthly
+  missingok
+  rotate 2
+  compress
+  delaycompress
+  notifempty
+  create 0640 ubuntu ubuntu
+}

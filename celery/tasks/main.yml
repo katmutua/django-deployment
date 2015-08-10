@@ -1,0 +1,46 @@
+---
+
+- name: Ensure that redis server is installed
+  apt: name=redis-server update_cache=yes state=installed
+  tags: redis
+
+- name: Switch to using upstart
+  template: src=redis_conf.j2 dest="/etc/init/redis-server.conf" 
+  tags: redis
+
+- name: Append 'daemonizie=no' to config (https://gist.github.com/bdotdub/714533)
+  lineinfile: >
+    dest='/etc/redis/redis.conf'
+    line='daemonize no'
+    insertafter=EOF
+    backup='yes'
+  tags: redis
+
+- name: Create log directory for celery
+  file: path={{proect_dir}}/celery
+    owner={{remote_user}}
+    group={{remote_user}}
+    state=directory
+  tags: celery
+
+- name: Create supervisor job for celery
+  template: src=supervisor_celery.conf.j2 dest="/etc/supervisor/conf.d/{{application}}-celery.conf" mode=644
+  tags: celery
+
+- name: Initialise log rotation for Celery logs
+  template: src=celery_log.j2
+    dest='/etc/logrotate.d/{{application}}-celery.log'
+    owner={{remote_user}}
+    group={{remote_user}}
+  tags: celery
+
+- name: Copy celery startup script to bin
+  template: src=init_celery.j2
+    dest='{{virtual_env}}/bin/start_celery'
+    owner={{remote_user}}
+    group={{remote_user}}
+  tags: celery
+
+- name: Re-read the Supervisor config files
+  command: supervisorctl reread
+  notify: restart {{application}}-celery
