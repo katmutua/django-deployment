@@ -1,4 +1,6 @@
 ---
+- name: include default step variables
+  include_vars: ./main.yml
 
 - name: Ensure that redis server is installed
   apt: name=redis-server update_cache=yes state=installed
@@ -35,12 +37,12 @@
   tags: celery
 
 - name: Copy celery startup script to bin
-  template: src=init_celery.j2
-    dest='{{virtual_env_activate}}/start_celery'
+  template: src=init_celery_conf.j2
+    dest='{{virtual_env_folder}}/start_celery'
     owner={{remote_user}}
     group={{remote_user}}
   tags: celery
 
-- name: Re-read the Supervisor config files
-  command: supervisorctl reread
-  notify: restart {{application_name}}-celery
+#- name: Re-read the Supervisor config files
+#  command: supervisorctl reread
+#  notify: restart {{application_name}}-celery

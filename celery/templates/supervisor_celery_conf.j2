@@ -1,0 +1,15 @@
+[program: {{application_name}}-celery]
+
+command={{virtual_env}}/bin/start_celery
+directory={{project_dir}}
+user = {{remote_user}}
+numprocs=1
+stdout_logfile={{project_dir}}/celery/celery-worker-stout.log
+stderr_logfile={{project_dir}}/celery/celery-worker-errors.log
+autostart=true
+autorestart=true
+startsecs=10
+stopsignal=KILL
+stopwaitsecs = 600
+killasgroup=true
+priority=998

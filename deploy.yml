@@ -33,4 +33,4 @@
   roles:
     - postgres_
     - web
-    #- celery
+    - celery
