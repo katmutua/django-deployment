@@ -24,7 +24,7 @@
   tags: celery
 
 - name: Create supervisor job for celery
-  template: src=supervisor_celery.conf.j2 dest="/etc/supervisor/conf.d/{{application_name}}-celery.conf" mode=644
+  template: src=supervisor_celery_conf.j2 dest="/etc/supervisor/conf.d/{{application_name}}-celery.conf" mode=644
   tags: celery
 
 - name: Initialise log rotation for Celery logs
