@@ -31,6 +31,6 @@
     - ./vars/vars.yml
 
   roles:
-    - postgres
+    - postgres_
     - web
     #- celery
