@@ -152,7 +152,7 @@
 - name: Ensure that the application site is enabled
   command: ln -s /etc/nginx/sites-available/{{application_name}}
            /etc/nginx/sites-enabled/{{application_name}}
-           creates=/etc/nginx/sites-enabled/{{application_name}}
+           creates=/etc/nginx/conf.d/{{application_name}}
 
 - name: Ensure Nginx service is started
   service: name=nginx state=started enabled=yes
