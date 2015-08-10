@@ -1,4 +1,7 @@
 ---
+- name: include default step variables
+  include_vars: ../vars/vars.yml
+
 - name: Install openssl and libssl
   apt: name={{ item }} update_cache=yes state=latest
   with_items:
@@ -25,8 +28,8 @@
   tags: packages
 
 - name: Create the virtualenv
-  command: virtualenv {{virtualenv}}--no-site-packages
-           creates={{virtualenv}}/activate
+  command: virtualenv {{virtual_env}} --no-site-packages
+           creates={{virtual_env_activate}}
 
 - name: Create the application log folder
   file: path={{project_dir}}
@@ -36,7 +39,7 @@
 
 - name: Create the virtualenv postactivate script to set environment variables
   template: src=postactivate_template.j2
-            dest={{virtualenv}}'/postactivate'
+            dest={{virtual_env_postactivate}}
             owner='{{remote_user}}'
             group='{{remote_user}}'
             backup=yes
@@ -54,32 +57,32 @@
         state=directory
 
 - name: Generate configuration file for supervisor
-  template: src=supervisor_config.j2
+  template: src=supervisor_conf.j2
             dest=/etc/supervisor/conf.d/{{application_name}}.conf
             backup=yes
 
-- name: Reload supervisor configuration files if modified
-  command: supervisorctl reread
+#- name: Reload supervisor configuration files if modified
+#  command: supervisorctl reread
 
-- name: Update Supervisor to add the app in the process group
-  command: supervisorctl update
+#- name: Update Supervisor to add the app in the process group
+#  command: supervisorctl update
 
-- name: Initialise log rotation for Supervisord
-  template: src=supervisor_log.j2
-            dest='/etc/logrotate.d/'{{application_name}}'-supervisor.log'
-            owner='{{remote_user}}'
-            group='{{remote_user}}'
+#- name: Initialise log rotation for Supervisord
+#  template: src=supervisor_log.j2
+#            dest='/etc/logrotate.d/'{{application_name}}'-supervisor.log'
+#            owner='{{remote_user}}'
+#            group='{{remote_user}}'
 
 - name: Install django application requirements in virtualenv
   sudo: yes 
-  pip: virtualenv={{virtualenv}} requirements={{django_requirements}}
+  pip: virtualenv={{virtual_env}} requirements={{django_requirements}}
   tags:
     - requirements 
 
 - name: Run makemigrations command
   sudo_user: '{{remote_user}}'
   sudo: yes
-  shell: . {{virtualenv}}/activate && . {{virtualenv}}/postactivate && cd '{{project_dir}}' && python manage.py makemigrations --noinput
+  shell: . {{virtual_env_activate}} && . {{virtual_env_postactivate}} && cd '{{project_dir}}' && python manage.py makemigrations --noinput
   when: run_django_syncdb
   tags: 
    - django 
@@ -87,7 +90,7 @@
 
 - name: Run migrate command
   sudo_user: '{{remote_user}}'
-  shell: . {{virtualenv}}/activate &&  . {{virtualenv}}/postactivate
+  shell: . {{virtual_env_activate}} &&  . {{virtual_env_postactivate}}
          && cd '{{project_dir}}' && python manage.py migrate --noinput
   when: run_django_migrations
   tags: 
@@ -95,7 +98,7 @@
     - migrate
 
 - name: Generate static django files for application
-  shell: . {{virtualenv}}/activate && . {{virtualenv}}/postactivate
+  shell: . {{virtual_env_activate}} && . {{virtual_env_postactivate}}
          && cd '{{project_dir}}' && python manage.py collectstatic --noinput
   when: run_django_collectstatic
   tags: 
@@ -117,7 +120,7 @@
 
 - name: Create the Nginx configuration file
   template: src=nginx_site_config.j2
-            dest=/etc/nginx/sites-available/{{application}}
+            dest=/etc/nginx/sites-available/{{application_name}}
             backup=yes
 
 - name: Ensure that the default site is disabled
@@ -125,16 +128,16 @@
            removes=/etc/nginx/sites-enabled/default
 
 - name: Ensure that the application site is enabled
-  command: ln -s /etc/nginx/sites-available/{{application}}
-           /etc/nginx/sites-enabled/{{application}}
-           creates=/etc/nginx/sites-enabled/{{application}}
+  command: ln -s /etc/nginx/sites-available/{{application_name}}
+           /etc/nginx/sites-enabled/{{application_name}}
+           creates=/etc/nginx/sites-enabled/{{application_name}}
 
 - name: Ensure Nginx service is started
   service: name=nginx state=started enabled=yes
 
 - name: Initialise log rotation for nginx
   template: src=nginx_log.j2
-            dest='/etc/logrotate.d/{{application}}-nginx.log'
+            dest='/etc/logrotate.d/{{application_name}}-nginx.log'
             owner={{remote_user}}
             group={{remote_user}}
   tags: backup
