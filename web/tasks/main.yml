@@ -74,7 +74,7 @@
             backup=yes
 
 - name: Create a log directory for supervisor
-  file: path={{project_dir}}/supervisord
+  file: path=/etc/supervisord/logs
         owner='{{remote_user}}'
         state=directory
 
@@ -83,17 +83,17 @@
             dest=/etc/supervisor/conf.d/{{application_name}}.conf
             backup=yes
 
-#- name: Reload supervisor configuration files if modified
-#  command: supervisorctl reread
+- name: Reload supervisor configuration files if modified
+  command: supervisorctl reread
 
-#- name: Update Supervisor to add the app in the process group
-#  command: supervisorctl update
+- name: Update Supervisor to add the app in the process group
+  command: supervisorctl update
 
-#- name: Initialise log rotation for Supervisord
-#  template: src=supervisor_log.j2
-#            dest='/etc/logrotate.d/'{{application_name}}'-supervisor.log'
-#            owner='{{remote_user}}'
-#            group='{{remote_user}}'
+- name: Initialise log rotation for Supervisord
+  template: src=supervisor_log.j2
+            dest=/etc/logrotate.d/{{application_name}}-supervisor.log'
+            owner='{{remote_user}}'
+            group='{{remote_user}}'
 
 - name: Install django application requirements in virtualenv
   sudo: yes 
