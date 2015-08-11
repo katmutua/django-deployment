@@ -4,13 +4,13 @@ upstream django {
 
 server {
     listen 80;
-    server_name 173.31.5.211; 
+    server_name 173.31.5.211; # substitute your machine's IP address or FQDN
     charset utf-8;
-    error_log /var/log/nginx/{{application_name}}.error.log debug;
-    client_max_body_size 75M; 
+    error_log /var/log/nginx/{{application}}.error.log debug;
+    client_max_body_size 75M;   # adjust to taste
 
     location /static {
-       alias {{project_dir}}/{{application_name}}/static;
+       alias {{django_dir}}/{{application}}/static;
     }
 
     location / {
